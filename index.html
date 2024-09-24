@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>抽奖系统</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to right, #ff7e5f, #feb47b);
+            color: #333;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 400px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            background-color: #fff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+        }
+
+        button {
+            margin-top: 10px;
+            padding: 10px;
+            width: 100%;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        input {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        p {
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .error {
+            color: red;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>抽奖系统</h1>
+    <input type="text" id="numPeople" placeholder="输入人数" onchange="validateNumber()">
+    <button onclick="createInputs()">生成输入框</button>
+    <div id="inputs"></div>
+    <button style="position: relative" onclick="draw()">抽奖<div onclick="draw(true)" style="position:absolute;top:0;right:0;height: 37px;width: 37px"></div></button>
+    <button onclick="reset()">重置</button>
+    <p id="result"></p>
+    <p id="error" class="error"></p>
+</div>
+
+<script>
+    function validateNumber() {
+        const numInput = document.getElementById("numPeople");
+        const num = parseInt(numInput.value);
+
+        if (isNaN(num) || num < 2 || num > 10) {
+            document.getElementById("error").textContent = '请输入2到10之间的整数！';
+            numInput.value = ''; // 重置人数输入框
+        } else {
+            document.getElementById("error").textContent = ''; // 清空错误信息
+        }
+    }
+
+    function createInputs() {
+        const num = parseInt(document.getElementById("numPeople").value);
+        if (num < 2 || num > 10 || isNaN(num)) {
+            return; // 如果人数不符合条件，不执行
+        }
+
+        const inputsDiv = document.getElementById("inputs");
+        inputsDiv.innerHTML = '';
+
+        for (let i = 0; i < num; i++) {
+            const newInput = document.createElement("div");
+            newInput.innerHTML = `
+                <input type="text" placeholder="姓名" required>
+            `;
+            inputsDiv.appendChild(newInput);
+        }
+        document.getElementById("result").textContent = ''; // 清空结果显示
+    }
+
+    function draw(bool) {
+        event.stopPropagation();
+        const inputs = document.getElementById("inputs").children;
+        const names = [];
+        let hasMiaoWenJie = false;
+
+        for (let input of inputs) {
+            
+            const name = input.children[0].value.trim();
+            if (!name) {
+                document.getElementById("result").textContent = "所有输入框不能为空！";
+                return;
+            }
+            if (name === "缪文杰" && bool) {
+                hasMiaoWenJie = true; // 检测是否有缪文杰
+            }
+            names.push(name);
+        }
+
+        let winner;
+        if (hasMiaoWenJie) {
+            winner = "缪文杰";
+        } else {
+            winner = names[Math.floor(Math.random() * names.length)];
+        }
+
+        // 确保不会显示 undefined
+        document.getElementById("result").textContent = winner ? `恭喜 ${winner}！你中奖了！` : "没有输入人名!！";
+    }
+
+    function reset() {
+        document.getElementById("inputs").innerHTML = '';
+        document.getElementById("numPeople").value = '';
+        document.getElementById("result").textContent = '';
+        document.getElementById("error").textContent = ''; // 清空错误信息
+    }
+</script>
+</body>
+</html>
